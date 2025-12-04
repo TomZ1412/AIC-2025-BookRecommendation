@@ -1,0 +1,63 @@
+# =========================
+# 数据集配置
+# =========================
+dataset: library_data_semi
+
+LOAD_COLUMNS:
+  # inter 文件：核心 ID 字段 + 时间戳 + 其他交互特征
+  # 注意：这里假设您的原始列名已经映射为别名，请根据您的实际文件列名进行调整
+  inter: [借阅人, book_id, 借阅时间, 还书时间, 续借时间, 续借次数]
+  # item 文件：物品 ID + 所有物品特征
+  item: [book_id, 题名, 作者, 出版社, 一级分类, 二级分类]
+  # user 文件：用户 ID + 所有用户特征
+  user: [借阅人, 性别, DEPT, 年级, 类型]
+
+field_alias:
+    user_id: [借阅人]
+    item_id: [book_id]
+    timestamp: [借阅时间]
+
+field_type:
+    user_id: token
+    item_id: token
+    性别: token
+    DEPT: token
+    年级: token
+    类型: token
+    题名: token
+    作者: token
+    出版社: token
+    一级分类: token
+    二级分类: token
+    timestamp: float
+
+# =========================
+# 模型配置
+# =========================
+model: BPR
+gpu_id: 7
+
+embedding_size: 64   
+reg_weight: 1e-3
+reproducibility: True
+
+# =========================
+# 训练 & 评估配置
+# =========================
+metrics: ['Recall', 'Precision', 'NDCG', 'MRR', 'Hit']
+topk: [1]
+valid_metric: Precision@1
+
+learning_rate: 2e-4
+epochs: 60
+train_batch_size: 4096
+eval_batch_size: 8192
+seed: 6
+# train_batch_size: 8192
+# eval_batch_size: 16384
+
+eval_setting: RO_RS,full 
+split_ratio: [0.8, 0.1, 0.1]
+
+neg_sampling: {'strategy': 'popular', 'sample_num': 1} 
+
